@@ -142,7 +142,7 @@ addTaskButton.addEventListener("click", () => {
   modal.classList.remove("active");
 
   document.querySelector("#task-title").value ="";
-  document.querySelector("task-description").value ="";
+  document.querySelector("#task-description").value ="";
 });
 
 //modal logic end
