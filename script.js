@@ -11,8 +11,8 @@ function addTask(title,desc,column){
     div.classList.add("task");
     div.setAttribute("draggable", "true");
 
-    div.innerHTML = `<h2>${taskTitle}</h2>
-    <p>${taskDesc}</p>
+    div.innerHTML = `<h2>${title}</h2>
+    <p>${desc}</p>
     <button>Delete</button>
     `;
     column.appendChild(div);
@@ -49,7 +49,7 @@ if (localStorage.getItem("tasks")) {
   const data = JSON.parse(localStorage.getItem("tasks"));
 
   for (const col in data) {
-    const column = document.querySelector(`${col}`);
+    const column = document.querySelector(`#${col}`);
     data[col].forEach((task) => {
         addTask(task.title,task.desc,column);
     });
