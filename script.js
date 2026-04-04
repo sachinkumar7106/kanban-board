@@ -19,6 +19,12 @@ function addTask(title,desc,column){
     div.addEventListener("drag",(e)=>{
         dragElement=div;
     });
+    const deleteBtn=div.querySelector("button")
+    deleteBtn.addEventListener("click",()=>{
+        div.remove();
+        updateTaskCount();
+    })
+
     return div;
 }
 
@@ -134,6 +140,9 @@ addTaskButton.addEventListener("click", () => {
   updateTaskCount();
 
   modal.classList.remove("active");
+
+  document.querySelector("#task-title").value ="";
+  document.querySelector("task-description").value ="";
 });
 
 //modal logic end
