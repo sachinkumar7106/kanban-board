@@ -3,6 +3,24 @@ let tasksData = {};
 const todo = document.querySelector("#todo");
 const progress = document.querySelector("#inprogress");
 const done = document.querySelector("#done");
+const soundToggleButton=document.querySelector("#sound-toggle");
+
+const completionAudio=new Audio("szaudio-christmas-holidays-short-266637.mp3");
+completionAudio.preload="auto";
+
+function playCompletionSound(){
+  if(!soundEnabled){return;}
+  completionAudio.currentTime=0;
+  completionAudio.play().catch(()=>{});
+}
+
+let soundEnabled=JSON.parse(localStorage.getItem("soundEnabled"))??"true";
+
+function updateSoundToggle(){
+  soundToggleButton.textContent=soundEnabled?"Sound: On":"Sound: Off";
+  soundToggleButton.classList.toggle("muted",!soundEnabled);
+  soundToggleButton.setAttribute("aria-pressed",String(soundEnabled));
+}
 
 const columns = [todo, progress, done];
 
@@ -69,14 +87,6 @@ tasks.forEach((task) => {
   });
 });
 
-// progress.addEventListener("dragenter",(e)=>{
-//     progress.classList.add("hover-over");
-// })
-
-// progress.addEventListener("dragleave",(e)=>{
-//     progress.classList.remove("hover-over");
-// })
-
 //function for drag and drop
 function addDragEventOnColumn(column) {
   column.addEventListener("dragenter", (e) => {
@@ -92,24 +102,16 @@ function addDragEventOnColumn(column) {
   });
   column.addEventListener("drop", (e) => {
     e.preventDefault();
-    columns.forEach((coltask) => {
-      const tasks = coltask.querySelectorAll(".task");
-      const count = coltask.querySelector(".right");
+    const movedToDone=dragElement&&column.id==="done"&&dragElement.parentElement!==done;
 
-      tasksData[coltask.id] = Array.from(tasks).map((t) => {
-        return {
-          title: t.querySelector("h2").innerText,
-          desc: t.querySelector("p").innerText,
-        };
-      });
-
-      localStorage.setItem("tasks", JSON.stringify(tasksData));
-      count.innerHTML = `Count : ${tasks.length}`;
-    });
     column.appendChild(dragElement);
     column.classList.remove("hover-over");
     
     updateTaskCount(); 
+
+    if (movedToDone){
+      playCompletionSound();
+    }
   });
 }
 
@@ -123,6 +125,17 @@ const modal = document.querySelector(".modal");
 const modalBg = document.querySelector(".modal .bg");
 const addTaskButton = document.querySelector("#add-new-task");
 
+updateSoundToggle();
+
+soundToggleButton.addEventListener("click",()=>{
+  soundEnabled=!soundEnabled;
+  localStorage.setItem("soundEnabled",JSON.stringify(soundEnabled));
+  updateSoundToggle();
+  if(soundEnabled){
+    playCompletionSound();
+  }
+})
+
 toggleModalButton.addEventListener("click", () => {
   modal.classList.toggle("active");
 });
@@ -134,6 +147,11 @@ modalBg.addEventListener("click", () => {
 addTaskButton.addEventListener("click", () => {
   const taskTitle = document.querySelector("#task-title").value;
   const taskDesc = document.querySelector("#task-description").value;
+
+  if (!taskTitle) {
+    alert("Task title is required.");
+    return;
+  }
 
   addTask(taskTitle,taskDesc,todo);
 
